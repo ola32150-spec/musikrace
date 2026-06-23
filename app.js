@@ -12,9 +12,19 @@ let currentSong =
 const screen =
   document.getElementById("screen");
 
-renderHome();
+  if(
+  location.pathname ===
+  "/join"
+){
 
-renderHome();
+  renderJoin();
+
+}
+else{
+
+  renderHome();
+
+}
 
 function renderHome() {
 
@@ -1603,4 +1613,34 @@ function connectTeam(
     true;
 
   startGame();
+}
+function renderJoin(){
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        🎸 Musikrace
+      </h2>
+
+      <p>
+        Hitta på ett lagnamn
+      </p>
+
+      <input
+        id="teamName"
+        placeholder="
+          Lagnamn
+        "
+      >
+
+      <button>
+        Anslut
+      </button>
+
+    </div>
+
+  `;
+
 }
