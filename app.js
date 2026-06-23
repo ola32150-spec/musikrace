@@ -1685,6 +1685,16 @@ async function joinGame(){
     input.value.trim();
 	alert(name);
 	alert("Nu ska vi prata med Supabase");
+	const response =
+  await fetch(
+    "https://coxfhjiycetfgxjoqvci.supabase.co/rest/v1/teams",
+    {
+      headers: {
+        apikey:
+          SUPABASE_KEY
+      }
+    }
+  );
 
   if(
     !name
