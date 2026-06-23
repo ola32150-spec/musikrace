@@ -1695,6 +1695,7 @@ async function joinGame(){
       }
     }
   );
+  alert(response.status);
 
   if(
     !name
