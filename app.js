@@ -1684,6 +1684,7 @@ async function joinGame(){
   const name =
     input.value.trim();
 	alert(name);
+	alert("Nu ska vi prata med Supabase");
 
   if(
     !name
