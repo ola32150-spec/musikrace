@@ -1,3 +1,4 @@
+alert("app.js startar");
 const SUPABASE_URL =
   "https://coxfhjiycetfgxjoqvci.supabase.co";
 
@@ -29,7 +30,8 @@ let currentSong =
 
 const screen =
   document.getElementById("screen");
-
+  alert("screen hittad");
+alert("före render");
   if(
   location.pathname ===
   "/join"
