@@ -1,4 +1,6 @@
-
+document.body.style.background =
+  "lime";
+  alert("start");
 const SUPABASE_URL =
   "https://coxfhjiycetfgxjoqvci.supabase.co";
 
