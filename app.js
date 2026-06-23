@@ -1635,9 +1635,59 @@ function renderJoin(){
         "
       >
 
-      <button>
+      <button
+        onclick="
+          joinGame()
+        "
+      >
         Anslut
       </button>
+
+    </div>
+
+  `;
+
+}
+function joinGame(){
+
+  const input =
+    document.getElementById(
+      "teamName"
+    );
+
+  const name =
+    input.value.trim();
+
+  if(
+    !name
+  ){
+    alert(
+      "Ange ett lagnamn."
+    );
+    return;
+  }
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        ✔ Ansluten
+      </h2>
+
+      <p>
+
+        Lag:
+
+        <strong>
+          ${name}
+        </strong>
+
+      </p>
+
+      <p>
+        Väntar på nästa låt...
+      </p>
 
     </div>
 
