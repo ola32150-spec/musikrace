@@ -1674,7 +1674,7 @@ function renderJoin(){
   `;
 
 }
-function joinGame(){
+async function joinGame(){
 
   const input =
     document.getElementById(
@@ -1683,6 +1683,7 @@ function joinGame(){
 
   const name =
     input.value.trim();
+	alert(name);
 
   if(
     !name
