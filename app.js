@@ -1,3 +1,13 @@
+const SUPABASE_URL =
+  "https://coxfhjiycetfgxjoqvci.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_c_DJ4suyrcFCf-Q2iP4NzQ__KAP5did";
+  const supabase =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 let songs =
   JSON.parse(
     localStorage.getItem(
