@@ -65,6 +65,13 @@ function renderHome() {
         onclick="startGame()"
       >
         🎮 Starta spel
+		<button
+  onclick="
+    testSupabase()
+  "
+>
+  🧪 Testa Supabase
+</button>
       </button>
 
     </div>
@@ -1711,5 +1718,23 @@ function joinGame(){
     </div>
 
   `;
+
+}
+async function testSupabase(){
+
+  const response =
+    await fetch(
+      "https://coxfhjiycetfgxjoqvci.supabase.co/rest/v1/teams",
+      {
+        headers: {
+          apikey:
+            SUPABASE_KEY
+        }
+      }
+    );
+
+  alert(
+    response.status
+  );
 
 }
