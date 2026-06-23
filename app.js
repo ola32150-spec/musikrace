@@ -1,28 +1,6 @@
 
-const SUPABASE_URL =
-  "https://coxfhjiycetfgxjoqvci.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_c_DJ4suyrcFCf-Q2iP4NzQ__KAP5did";
-  let supabase = null;
-
-if(
-  window.supabase
-){
-
-  supabase =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-}
-let songs =
-  JSON.parse(
-    localStorage.getItem(
-      "musikrace_songs"
-    )
-  ) || [];
+console.log("app.js rad 2");
+let songs = [];
   let teams = [];
 
 let currentSong =
@@ -31,22 +9,10 @@ let currentSong =
 const screen =
   document.getElementById("screen");
   
-  if(
-  location.pathname ===
-  "/join"
-){
-
-  renderJoin();
-
-}
-else{
-
-  renderHome();
-
-}
+renderHome();
 
 function renderHome() {
-
+	
   screen.innerHTML = `
 
     <div class="card">
@@ -59,20 +25,14 @@ function renderHome() {
         onclick="openLibrary()"
       >
         📚 Mina låtar
-      </button>
-
-      <button
-        onclick="startGame()"
-      >
-        🎮 Starta spel
+		</button>
+		
 		<button
-  onclick="
-    testSupabase()
-  "
+  onclick="alert('knappen fungerar')"
 >
-  🧪 Testa Supabase
+  🎮 Starta spel
 </button>
-      </button>
+		
 
     </div>
 
@@ -810,8 +770,14 @@ function openLibrary(){
   screen.innerHTML =
     html;
 }
-
 function startGame(){
+
+  alert("startGame fungerar");
+
+}
+
+/*function startGame(){
+	alert("startGame");
 
   let html = `
 
@@ -820,18 +786,7 @@ function startGame(){
       <h2>
         🎮 Musikrace
       </h2>
-	  <p>
-
-  ${
-    teams.filter(
-      t =>
-        t.connected
-    ).length
-  }
-
-  lag anslutna
-
-</p>
+	  
 
       <button
         onclick="
@@ -840,37 +795,22 @@ function startGame(){
       >
         ➕ Lägg till lag
       </button>
+	  <hr>
+	  <h3>
+  Poängställning
+</h3>
+
 
   `;
 
   teams.forEach(
-  (team, i) => {
+  team => {
 
     html += `
 
-      <div
-        class="songRow"
-      >
-
-        ${
-          team.connected
-            ? "✔"
-            : "○"
-        }
-
-        ${team.name}
-
-        <button
-          onclick="
-            connectTeam(
-              ${i}
-            )
-          "
-        >
-          📱 Anslut
-        </button>
-
-      </div>
+      <p>
+        ⭐ ${team.name}
+      </p>
 
     `;
 
@@ -907,10 +847,11 @@ function startGame(){
     </div>
 
   `;
-
+alert("före screen");
   screen.innerHTML =
     html;
 }
+*/
 function newSong(){
 
   const title =
@@ -1640,63 +1581,9 @@ function connectTeam(
 
   startGame();
 }
-function renderJoin(){
 
-  screen.innerHTML = `
 
-    <div class="card">
-
-      <h2>
-        🎸 Musikrace
-      </h2>
-
-      <p>
-        Hitta på ett lagnamn
-      </p>
-
-      <input
-        id="teamName"
-        placeholder="
-          Lagnamn
-        "
-      >
-
-      <button
-        onclick="
-          joinGame()
-        "
-      >
-        Anslut
-      </button>
-
-    </div>
-
-  `;
-
-}
-async function joinGame(){
-
-  const input =
-    document.getElementById(
-      "teamName"
-    );
-
-  const name =
-    input.value.trim();
-	alert(name);
-	alert("Nu ska vi prata med Supabase");
-	const response =
-  await fetch(
-    "https://coxfhjiycetfgxjoqvci.supabase.co/rest/v1/teams",
-    {
-      headers: {
-        apikey:
-          SUPABASE_KEY
-      }
-    }
-  );
-  alert(response.status);
-
+  /*
   if(
     !name
   ){
@@ -1751,3 +1638,4 @@ async function testSupabase(){
   );
 
 }
+*/
