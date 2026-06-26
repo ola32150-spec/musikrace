@@ -19,31 +19,34 @@ let currentSong =
 const screen =
   document.getElementById("screen");
   
-const params =
-  new URLSearchParams(
-    window.location.search
-  );
+  window.onload = function(){
 
-const song =
-  params.get("song");
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const song =
+    params.get("song");
+
+  if(
+    song !== null
+  ){
+
+    joinGame(
+      Number(song)
+    );
+
+  }
+  else{
+
+    openLibrary();
+
+  }
+
+};
   
-  alert(
-  "URL: " +
-  window.location.href +
-  "\n\nsong = " +
-  song
-);
-
-if(
-  song !== null
-){
-  joinGame(
-    Number(song)
-  );
-}
-else{
-  openLibrary();
-}
+  
 
 function renderHome() {
 	
@@ -2777,6 +2780,8 @@ function beginGame(
 function joinGame(
   songIndex
 ){
+
+  alert("joinGame körs");
 
   screen.innerHTML = `
 
