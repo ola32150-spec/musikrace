@@ -19,7 +19,31 @@ let currentSong =
 const screen =
   document.getElementById("screen");
   
-openLibrary();
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const song =
+  params.get("song");
+  
+  alert(
+  "URL: " +
+  window.location.href +
+  "\n\nsong = " +
+  song
+);
+
+if(
+  song !== null
+){
+  joinGame(
+    Number(song)
+  );
+}
+else{
+  openLibrary();
+}
 
 function renderHome() {
 	
@@ -2449,11 +2473,11 @@ function songMenu(
       </h2>
 
 	  <button
-  onclick="
-    joinGame(
-      ${songIndex}
-    )
-  "
+onclick="
+  startSong(
+    ${songIndex}
+  )
+"
 >
   ▶️ Starta låt
 </button>
@@ -2538,22 +2562,15 @@ function startSong(
   för att ansluta.
 </p>
 
-<div
+<canvas
+  id="hostQRCode"
+  width="220"
+  height="220"
   style="
-    width:220px;
-    height:220px;
+    display:block;
     margin:30px auto;
-    border:3px dashed #999;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    color:#666;
   "
->
-  QR-kod
-</div>
+></canvas>
 <p
   style="
     text-align:center;
@@ -2589,7 +2606,15 @@ function startSong(
     </div>
 
   `;
+const url =
+  window.location.origin +
+  window.location.pathname +
+  "?song=" + songIndex;
 
+QRCode.toCanvas(
+  document.getElementById("hostQRCode"),
+  url
+);
 }
 
 function showFinalTask(
