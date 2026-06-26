@@ -2782,20 +2782,15 @@ function joinGame(
         spela tillsammans.
       </p>
 
-      <div
-        style="
-          width:220px;
-          height:220px;
-          margin:30px auto;
-          border:3px dashed #999;
-          border-radius:12px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        "
-      >
-        QR-kod
-      </div>
+<canvas
+  id="qrcode"
+  width="220"
+  height="220"
+  style="
+    display:block;
+    margin:30px auto;
+  "
+></canvas>
 
 	  <button
   onclick="
@@ -2810,7 +2805,15 @@ function joinGame(
     </div>
 
   `;
+const url =
+  window.location.origin +
+  window.location.pathname +
+  "?song=" + songIndex;
 
+QRCode.toCanvas(
+  document.getElementById("qrcode"),
+  url
+);
 }
 
 function showQuestion(
