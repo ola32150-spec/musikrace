@@ -2781,7 +2781,7 @@ function joinGame(
   songIndex
 ){
 
-  alert("joinGame körs");
+ 
 
   screen.innerHTML = `
 
