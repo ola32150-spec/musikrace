@@ -36,6 +36,24 @@ button {
   color: white;
 }
 
+.deleteButton {
+  width: auto;
+  padding: 4px 8px;
+  margin-top: 0;
+  background: #d32f2f;
+  color: white;
+}
+
+.smallButton {
+  width: auto;
+  padding: 6px 14px;
+  margin-top: 0;
+  background: #007aff;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+}
+
 button.secondary {
   background: #666;
 }
@@ -57,10 +75,16 @@ textarea {
 .songRow,
 .quizRow {
   background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 1px;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
 }
+
 
 .questionRow {
   background: white;
@@ -76,4 +100,26 @@ textarea {
 
 .notDone {
   color: #999;
+}
+.questionCard{
+  background:white;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+
+.questionCard:hover{
+  background:#f8f8f8;
+}
+
+.questionCard{
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    background 0.3s ease;
 }

@@ -1,7 +1,17 @@
 
 console.log("app.js rad 2");
-let songs = [];
-  let teams = [];
+let songs =
+  JSON.parse(
+    localStorage.getItem(
+      "musikrace_songs"
+    )
+  ) || [];
+  let teams =
+  JSON.parse(
+    localStorage.getItem(
+      "musikrace_teams"
+    )
+  ) || [];
 
 let currentSong =
   null;
@@ -9,7 +19,7 @@ let currentSong =
 const screen =
   document.getElementById("screen");
   
-renderHome();
+openLibrary();
 
 function renderHome() {
 	
@@ -28,7 +38,7 @@ function renderHome() {
 		</button>
 		
 		<button
-  onclick="alert('knappen fungerar')"
+  onclick="startGame()"
 >
   🎮 Starta spel
 </button>
@@ -113,9 +123,10 @@ function openQuiz(index) {
 		html += `
   <div class="songRow">
 
-    <h3>
-      🎵 ${song.title}
-    </h3>
+  <span>
+  🎵 ${song.title}
+  ${song.artist ? " – " + song.artist : ""}
+</span>
 
     <div>
       ${song.questions.length}
@@ -144,17 +155,19 @@ function openQuiz(index) {
       ✏️ Byt namn
     </button>
 
-    <button
-      class="danger"
-      onclick="
-        deleteSong(
-          ${index},
-          ${songIndex}
-        )
-      "
-    >
-      🗑️ Ta bort
-    </button>
+	
+	<span
+  onclick="
+    event.stopPropagation();
+    deleteSong(${i});
+  "
+  style="
+    cursor:pointer;
+    font-size:20px;
+  "
+>
+  🗑️
+</span>
 
     <button
       onclick="
@@ -186,144 +199,124 @@ function openQuiz(index) {
   screen.innerHTML = html;
 }
 
-function newSong(
-  quizIndex
-) {
+function newSong(){
 
   const title =
     prompt(
       "Låtens namn?"
     );
 
-  if (!title) {
+  if(!title){
     return;
   }
+  const artist =
+  prompt(
+    "Artist?"
+  ) || "";
 
-  const count =
-    Number(
-      prompt(
-        "Antal frågor?"
-      )
-    );
-
-  if (!count) {
-    return;
-  }
-
-  const finalTask =
-    prompt(
-      "Slutuppdrag?"
-    );
-
-  const questions = [];
-
-  for (
-    let i = 0;
-    i < count;
-    i++
-  ) {
-
-    questions.push({
-      question: "",
-      answer: "",
-      image: "",
-      penalty: 10
-    });
-
-  }
-
-  quizzes[
-    quizIndex
-  ].
   songs.push({
 
   title,
 
-  useFinalTask:
-    true,
+  artist,
 
-  finalTask:
-    finalTask || "",
+  questions: [],
 
-  questions,
+  finalTask: "",
+  finalTaskImage: "",
 
   played: false
 
 });
+
 saveData();
-  openQuiz(
-    quizIndex
-  );
+
+editSong(
+  songs.length - 1
+);
+
 }
-
-function openSong(
-  quizIndex,
-  songIndex
-) {
-
-  const song =
-    quizzes[
-      quizIndex
-    ].songs[
-      songIndex
-    ];
-
-  let html = `
-    <div class="card">
-
-      <h2>
-        🎵
-        ${song.title}
-      </h2>
-
-      <p>
-        ${song.finalTask}
-      </p>
-
-      <button
-        class="secondary"
-        onclick="
-          openQuiz(
-            ${quizIndex}
-          )
-        ">
-        ⬅ Tillbaka
-      </button>
-
-    </div>
-  `;
-
-  song.questions.forEach(
-    (q, i) => {
-
-    const done =
-      q.question
-      ? "🟢"
-      : "⚪";
-
-	  html += `
-<div
-  class="questionRow"
+/*
+			function openSong(
+			  quizIndex,
+			  songIndex
+			) {
+			
+			  const song =
+			    quizzes[
+			      quizIndex
+			    ].songs[
+			      songIndex
+			    ];
+				alert("openSong körs");
+			
+			  let html = `
+			    <div class="card">
+			
+			      <h2>
+			        🎵
+			        ${song.title}
+			      </h2>
+				  <button
   onclick="
-    openQuestion(
+    addQuestion(
       ${quizIndex},
-      ${songIndex},
-      ${i}
+      ${songIndex}
     )
   "
 >
-
-  ${done}
-  Fråga ${i + 1}
-
-</div>
-`;
-
-  });
+  ➕ Lägg till fråga
+</button>
+			
+			      <p>
+			        ${song.finalTask}
+			      </p>
+			
+			      <button
+			        class="secondary"
+			        onclick="
+			          openQuiz(
+			            ${quizIndex}
+			          )
+			        ">
+			        ⬅ Tillbaka
+			      </button>
+			
+			    </div>
+			  `;
+			
+			  song.questions.forEach(
+			    (q, i) => {
+			
+			    const done =
+			      q.question
+			      ? "🟢"
+			      : "⚪";
+			
+				  html += `
+			<div
+			  class="questionRow"
+			  onclick="
+			    openQuestion(
+			      ${quizIndex},
+			      ${songIndex},
+			      ${i}
+			    )
+			  "
+			>
+			
+			  ${done}
+			  Fråga ${i + 1}
+			
+			</div>
+			`;
+			
+			  });
 
   screen.innerHTML =
     html;
 }
+*/
 function changePenalty(
   amount
 ) {
@@ -338,23 +331,58 @@ function changePenalty(
     amount;
 
   if(
-    window.currentPenalty < 1
+    window.currentPenalty < 5
   ){
-    window.currentPenalty = 1;
+    window.currentPenalty = 5;
   }
 
   document
     .getElementById(
       "penaltyValue"
     )
-    .textContent =
-      window.currentPenalty;
-}
+	.textContent =
+  window.currentPenalty + " sek";
+  songs[
+  window.currentSongIndex
+].questions[
+  window.currentQuestionIndex
+].penalty =
+  window.currentPenalty;
 
+saveData();
+}
+function addQuestion(
+  songIndex
+){
+
+  songs[
+    songIndex
+  ].questions.push({
+
+    question: "",
+
+    answer: "",
+
+    image: "",
+
+    penalty: 10
+
+  });
+
+  saveData();
+
+openQuestion2(
+  songIndex,
+  songs[songIndex].questions.length - 1
+);
+
+}
 function openQuestion(
+
   songIndex,
   questionIndex
 ){
+	console.log("openQuestion");
 
   const song =
     songs[songIndex];
@@ -364,7 +392,7 @@ function openQuestion(
       questionIndex
     ];
 
-  screen.innerHTML = `
+  let html = `
 
     <div class="card">
 
@@ -378,120 +406,38 @@ function openQuestion(
         av
         ${song.questions.length}
       </h3>
-
-      <label>
-        Frågetext
-      </label>
-
-      <input
-        id="questionText"
-        value="${q.question}"
-      >
-
-      <label>
-        Rätt svar
-      </label>
-
-      <input
-        id="answerText"
-        value="${q.answer}"
-      >
-
-      <label>
-        Bild
-      </label>
-
-      <input
-        id="imageFile"
-        type="file"
-        accept="image/*"
-      >
-
-      <div id="preview">
-
-        ${
-          q.image
-            ? `
-            <img
-              src="${q.image}"
-              style="
-                width:200px;
-                margin-top:15px;
-                border-radius:12px;
-              "
-            >
-            `
-            : ""
-        }
-
-      </div>
-
-      <label>
-        Strafftid vid fel
-      </label>
-
+	  ${
+  song.questions.length > 1
+    ? `
       <div
         style="
-          display:flex;
-          gap:20px;
-          justify-content:center;
-          align-items:center;
-          margin-bottom:20px;
+          background:#f5f5f5;
+          padding:10px;
+          border-radius:8px;
+          margin:15px 0;
+          font-size:14px;
         "
       >
+<b>🎵 Frågor i låten</b><br><br>
 
-        <button
-          type="button"
-          onclick="
-            changePenalty(-1)
-          "
-        >
-          −
-        </button>
-
-        <span
-          id="penaltyValue"
-          style="
-            font-size:30px;
-            min-width:50px;
-            text-align:center;
-          "
-        >
-          ${q.penalty || 10}
-        </span>
-
-        <button
-          type="button"
-          onclick="
-            changePenalty(1)
-          "
-        >
-          +
-        </button>
-
+${
+  renderQuestionList(
+    song,
+    songIndex,
+    questionIndex
+  )
+}
       </div>
+    `
+    : ""
+}
 
-      <button
-        onclick="
-          saveQuestion(
-            ${songIndex},
-            ${questionIndex}
-          )
-        "
-      >
-        💾 Spara
-      </button>
-
-      <button
-        class="secondary"
-        onclick="
-          openSong(
-            ${songIndex}
-          )
-        "
-      >
-        ⬅ Tillbaka
-      </button>
+${renderQuestionEditor(
+  song,
+  q,
+  songIndex,
+  questionIndex
+)}
 
     </div>
 
@@ -499,6 +445,162 @@ function openQuestion(
 
   window.currentPenalty =
     q.penalty || 10;
+screen.innerHTML =
+  html;
+}
+
+function openQuestion2(
+
+  songIndex,
+  questionIndex
+){
+	console.log("openQuestion2");
+
+  const song =
+    songs[songIndex];
+	window.currentSongIndex =
+  songIndex;
+	window.currentQuestionIndex =
+  questionIndex;
+	
+
+const q =
+  song.questions[
+    questionIndex
+  ] || {
+    penalty: 10
+  };
+
+  let html = `
+
+    <div class="card">
+
+      <h2>
+        🎵 ${song.title}
+      </h2>
+
+	  
+	  ${renderQuestionList(
+  song,
+  songIndex,
+  questionIndex
+)}
+<button
+  class="secondary"
+  onclick="
+    openLibrary()
+  "
+>
+  ⬅ Till låtarkivet
+</button>
+    </div>
+
+  `;
+
+  window.currentPenalty =
+    q.penalty || 10;
+
+  screen.innerHTML =
+    html;
+
+}
+
+function goToQuestion(
+  songIndex,
+  questionIndex
+){
+
+  saveQuestionData(
+    songIndex,
+    window.currentQuestionIndex
+  );
+
+  openQuestion2(
+    songIndex,
+    questionIndex
+  );
+
+}
+
+function openFinalTask2(
+  songIndex
+){
+
+  const song =
+    songs[songIndex];
+
+  let html = `
+
+    <div class="card">
+
+      <h2>
+        🎵 ${song.title}
+      </h2>
+
+      ${renderQuestionList(
+        song,
+        songIndex,
+        -1
+      )}
+
+      ${renderFinalTaskEditor(
+        song,
+        songIndex
+      )}
+	  <button
+  class="secondary"
+  onclick="
+    openLibrary()
+  "
+>
+  ⬅ Till låtarkivet
+</button>
+
+    </div>
+
+  `;
+
+  screen.innerHTML =
+    html;
+	const imageInput =
+  document.getElementById(
+    "finalTaskImageFile"
+  );
+
+imageInput.onchange =
+  function(){
+
+    const file =
+      this.files[0];
+
+    if(!file){
+      return;
+    }
+
+    const reader =
+      new FileReader();
+
+    reader.onload =
+      function(e){
+
+        songs[songIndex]
+          .finalTaskImage =
+          e.target.result;
+
+        saveData();
+
+        openFinalTask2(
+          songIndex
+        );
+
+      };
+
+    reader.readAsDataURL(
+      file
+    );
+
+  };
+
 }
 function saveQuestion(
   songIndex,
@@ -551,9 +653,10 @@ function saveQuestion(
 
         saveData();
 
-        openSong(
-          songIndex
-        );
+		openQuestion2(
+  songIndex,
+  questionIndex
+);
 
       };
 
@@ -566,9 +669,78 @@ function saveQuestion(
 
     saveData();
 
-    openSong(
-      songIndex
+	openQuestion2(
+  songIndex,
+  questionIndex
+);
+
+  }
+}
+
+function saveQuestionData(
+  songIndex,
+  questionIndex
+){
+
+  const q =
+    songs[songIndex]
+      .questions[
+        questionIndex
+      ];
+
+  q.question =
+    document
+      .getElementById(
+        "questionText"
+      )
+      .value
+      .trim();
+
+  q.answer =
+    document
+      .getElementById(
+        "answerText"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+  q.penalty =
+    window.currentPenalty;
+
+  const file =
+    document
+      .getElementById(
+        "imageFile"
+      )
+      .files[0];
+
+  if(file){
+
+    const reader =
+      new FileReader();
+
+    reader.onload =
+      function(e){
+
+        q.image =
+          e.target.result;
+
+        saveData();
+
+     
+
+      };
+
+    reader.readAsDataURL(
+      file
     );
+
+  }
+  else{
+
+    saveData();
+
 
   }
 }
@@ -578,6 +750,13 @@ function saveData(){
     "musikrace_songs",
     JSON.stringify(
       songs
+    )
+  );
+
+  localStorage.setItem(
+    "musikrace_teams",
+    JSON.stringify(
+      teams
     )
   );
 
@@ -630,6 +809,33 @@ function deleteSong(
   saveData();
 
   openLibrary();
+}
+
+function deleteQuestion(
+  songIndex,
+  questionIndex
+){
+
+  if(
+    !confirm(
+      "Ta bort frågan?"
+    )
+  ){
+    return;
+  }
+
+  songs[
+    songIndex
+  ].questions.splice(
+    questionIndex,
+    1
+  );
+
+  saveData();
+
+  openSong(
+    songIndex
+  );
 }
 function moveSongUp(
   quizIndex,
@@ -698,22 +904,33 @@ function openLibrary(){
 
     <div class="card">
 
-      <h2>
-        📚 Mina låtar
-      </h2>
+<div
+  style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  "
+>
 
-      <button
-        onclick="newSong()"
-      >
-        ➕ Ny låt
-      </button>
+  <h2
+    style="
+      margin:0;
+    "
+  >
+    📚 Mina låtar (${songs.length})
+  </h2>
 
-      <button
-        class="secondary"
-        onclick="renderHome()"
-      >
-        ⬅ Tillbaka
-      </button>
+<button
+  class="smallButton"
+  onclick="newSong()"
+>
+  ➕ Ny låt
+</button>
+
+</div>
+
+	  
 
     </div>
 
@@ -724,41 +941,24 @@ function openLibrary(){
 
       html += `
 
-        <div class="songRow">
+        <div
+  class="songRow"
+  onclick="
+    songMenu(${i})
+  "
+>
 
-          <h3>
-            🎵 ${song.title}
-          </h3>
+<span>
+  🎵 ${song.title}
+${song.artist ? " – " + song.artist : ""}
+</span>
 
-          <div>
-            ${song.questions.length}
-            frågor
-          </div>
 
-          <button
-            onclick="
-              openSong(${i})
-            "
-          >
-            Öppna
-          </button>
+		  
 
-          <button
-            onclick="
-              renameSong(${i})
-            "
-          >
-            ✏️
-          </button>
+		  
 
-          <button
-            class="danger"
-            onclick="
-              deleteSong(${i})
-            "
-          >
-            🗑️
-          </button>
+
 
         </div>
 
@@ -770,14 +970,12 @@ function openLibrary(){
   screen.innerHTML =
     html;
 }
+
+
+
+
 function startGame(){
-
-  alert("startGame fungerar");
-
-}
-
-/*function startGame(){
-	alert("startGame");
+	
 
   let html = `
 
@@ -803,14 +1001,49 @@ function startGame(){
 
   `;
 
-  teams.forEach(
-  team => {
+  [...teams]
+  .sort(
+    (a, b) =>
+      b.score - a.score
+  )
+  .forEach(
+    team => {
 
     html += `
 
-      <p>
-        ⭐ ${team.name}
-      </p>
+      <div class="songRow">
+
+  ⭐ ${team.name} (${team.score})
+
+  <button
+    onclick="
+      addPoint(
+        '${team.name}'
+      )
+    "
+  >
+    ➕1
+  </button>
+  <button
+  onclick="
+    removePoint(
+      '${team.name}'
+    )
+  "
+>
+  ➖1
+</button>
+<button
+  onclick="
+    deleteTeam(
+      '${team.name}'
+    )
+  "
+>
+  🗑
+</button>
+
+</div>
 
     `;
 
@@ -847,76 +1080,13 @@ function startGame(){
     </div>
 
   `;
-alert("före screen");
+
   screen.innerHTML =
     html;
 }
-*/
-function newSong(){
 
-  const title =
-    prompt(
-      "Låtens namn?"
-    );
 
-  if(!title){
-    return;
-  }
-
-  const count =
-    Number(
-      prompt(
-        "Antal frågor?"
-      )
-    );
-
-  if(!count){
-    return;
-  }
-
-  const finalTask =
-    prompt(
-      "Slutuppdrag?"
-    );
-
-  const questions = [];
-
-  for(
-    let i = 0;
-    i < count;
-    i++
-  ){
-
-    questions.push({
-
-      question: "",
-      answer: "",
-      image: "",
-      penalty: 10
-
-    });
-
-  }
-
-  songs.push({
-
-  title,
-
-  useFinalTask:
-    true,
-
-  finalTask:
-    finalTask || "",
-
-  questions
-
-});
-
-  saveData();
-
-  openLibrary();
-}
-function openSong(
+function openSong (
   songIndex
 ){
 
@@ -931,83 +1101,51 @@ function openSong(
         🎵
         ${song.title}
       </h2>
-
-      <div
-        style="
-          font-size:30px;
-          text-align:center;
-          margin:20px 0;
-        "
-      >
-        ${
-          song.questions
-            .map(
-              q =>
-                q.question
-                ? "🟢"
-                : "⚪"
-            )
-            .join("")
-        }
-      </div>
-
-	  <label>
-
-  <input
-    type="checkbox"
-    id="useFinalTask"
-    ${
-      song.useFinalTask
-        ? "checked"
-        : ""
-    }
-  >
-
-  Använd slutuppgift
-
-</label>
-
-<textarea
-  id="finalTask"
-  rows="3"
-  style="
-    width:100%;
-    margin-top:15px;
-  "
->${
-  song.finalTask || ""
-}</textarea>
-
-<button
+	  
+	  <button
+  class="secondary"
   onclick="
-    saveSongSettings(
+    previewSong(
       ${songIndex}
     )
   "
 >
-  💾 Spara inställningar
+  👁️ Förhandsgranska
 </button>
 
-      <button
-        class="secondary"
-        onclick="
-          openLibrary()
-        "
-      >
-        ⬅ Tillbaka
-      </button>
+<button
+  onclick="
+    editSong(
+      ${songIndex}
+    )
+  "
+>
+  ✏️ Redigera
+</button>
 
-    </div>
+	  <button
+  onclick="
+    addQuestion(
+      ${songIndex}
+    )
+  "
+>
+  ➕ Lägg till fråga
+</button>
+
+
+
+	  <label>
+
+	  
+
+
 
   `;
 
   song.questions.forEach(
     (q, i) => {
 
-      const done =
-        q.question
-        ? "🟢"
-        : "⚪";
 
       html += `
 
@@ -1022,7 +1160,7 @@ function openSong(
           "
         >
 
-          ${done}
+          
           ${q.image ? "🖼️" : ""}
           Fråga ${i + 1}
 
@@ -1032,10 +1170,99 @@ function openSong(
 
     }
   );
+  html += `
+
+  <h3
+    style="
+      background:orange;
+      padding:12px;
+      border-radius:12px;
+      text-align:center;
+    "
+  >
+    🏁 FÖR ATT VINNA LÅTEN
+  </h3>
+
+  <textarea
+    id="finalTask"
+	
+    rows="6"
+    style="
+      width:100%;
+      margin-top:15px;
+    "
+  >${
+    song.finalTask || ""
+  }</textarea>
+  
+  <label>
+  Bild
+</label>
+
+<input
+  id="finalTaskImageFile"
+  type="file"
+  accept="image/*"
+>
+${
+  song.finalTaskImage
+    ? `
+      <img
+        src="${song.finalTaskImage}"
+        style="
+          width:200px;
+          margin-top:15px;
+          border-radius:12px;
+        "
+      >
+    `
+    : ""
+}
+
+  <button
+    class="danger"
+    onclick="
+      deleteSong(
+        ${songIndex}
+      )
+    "
+  >
+    🗑️ Ta bort låten
+  </button>
+
+  <button
+  class="secondary"
+  onclick="
+    saveFinalTask(
+      ${songIndex}
+    )
+  "
+>
+  ⬅ Tillbaka
+</button>
+
+</div>
+
+`;
 
   screen.innerHTML =
     html;
 }
+
+function editSong(
+  songIndex
+){
+
+  openQuestion2(
+    songIndex,
+    0
+  );
+
+}
+
+
+/*
+
 function renameSong(
   songIndex
 ){
@@ -1190,6 +1417,8 @@ function startRound(
 
   renderRace();
 }
+*/
+
 function renderRace(){
 	
 	console.log("renderRace körs");
@@ -1527,6 +1756,7 @@ function endRound(){
 
   chooseSong();
 }
+/*
 function saveSongSettings(
   songIndex
 ){
@@ -1555,6 +1785,7 @@ function saveSongSettings(
     songIndex
   );
 }
+*/
 function resetPlayedSongs(){
 
   songs.forEach(
@@ -1581,7 +1812,130 @@ function connectTeam(
 
   startGame();
 }
+function addPoint(
+  teamName
+){
 
+  const team =
+    teams.find(
+      t =>
+        t.name ===
+        teamName
+    );
+
+  if(team){
+
+    team.score++;
+
+saveData();
+
+    startGame();
+
+  }
+
+}
+function removePoint(
+  teamName
+){
+
+  const team =
+    teams.find(
+      t =>
+        t.name ===
+        teamName
+    );
+
+  if(
+    team &&
+    team.score > 0
+  ){
+
+    team.score--;
+
+saveData();
+
+    startGame();
+
+  }
+
+}
+function deleteTeam(
+  teamName
+){
+
+  if(
+    !confirm(
+      `Ta bort ${teamName}?`
+    )
+  ){
+    return;
+  }
+
+  teams =
+    teams.filter(
+      team =>
+        team.name !==
+        teamName
+    );
+
+  saveData();
+
+  startGame();
+
+}
+function saveFinalTask(
+  songIndex
+){
+
+  songs[
+    songIndex
+  ].finalTask =
+    document
+      .getElementById(
+        "finalTaskText"
+      )
+      .value
+      .trim();
+	  
+	  const file =
+  document
+    .getElementById(
+      "finalTaskImageFile"
+    )
+    .files[0];
+
+	if(file){
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    function(e){
+
+      songs[
+        songIndex
+      ].finalTaskImage =
+        e.target.result;
+
+      saveData();
+
+      openLibrary();
+
+    };
+
+  reader.readAsDataURL(
+    file
+  );
+
+}
+else{
+
+  saveData();
+
+  openLibrary();
+
+}
+}
 
   /*
   if(
@@ -1639,3 +1993,1246 @@ async function testSupabase(){
 
 }
 */
+
+function renderQuestionCard(
+  songIndex,
+  question,
+  questionIndex
+){
+
+  return `
+
+    <div
+      class="questionCard"
+	  onclick="
+  openQuestion2(
+    ${songIndex},
+    ${questionIndex}
+  )
+"
+    >
+
+      <div style="flex:1;">
+
+        <b>🎵 Fråga ${questionIndex + 1}</b>
+
+        <br><br>
+
+        ${question.question}
+
+        <br><br>
+
+        <i>Svar: ${question.answer}</i>
+
+      </div>
+
+      ${
+        question.image
+          ? `
+            <img
+              src="${question.image}"
+              style="
+                width:70px;
+                border-radius:8px;
+              "
+            >
+          `
+          : ""
+      }
+
+    </div>
+
+  `;
+
+}
+
+function renderFinalTaskCard(
+  songIndex,
+  song
+){
+
+  return `
+
+    <div
+      class="questionCard"
+      onclick="
+        openFinalTask2(
+          ${songIndex}
+        )
+      "
+    >
+
+      <div style="flex:1;">
+
+        <b>
+          🏁 Slutuppdrag
+        </b>
+
+        <br><br>
+
+        ${
+          song.finalTask
+            ? song.finalTask
+            : "<i>Inget slutuppdrag ännu.</i>"
+        }
+
+      </div>
+
+      ${
+        song.finalTaskImage
+          ? `
+            <img
+              src="${song.finalTaskImage}"
+              style="
+                width:70px;
+                border-radius:8px;
+              "
+            >
+          `
+          : ""
+      }
+
+    </div>
+
+  `;
+
+}
+function renderQuestionEditor(
+  song,
+  q,
+  songIndex,
+  questionIndex
+){
+
+  return `
+
+      <label>
+        Frågetext
+      </label>
+
+	  <input
+  id="questionText"
+  value="${q.question}"
+  oninput="
+    saveQuestionData(
+      ${songIndex},
+      ${questionIndex}
+    )
+  "
+>
+
+      <label>
+        Rätt svar
+      </label>
+
+	  <input
+  id="answerText"
+  value="${q.answer}"
+  oninput="
+    saveQuestionData(
+      ${songIndex},
+      ${questionIndex}
+    )
+  "
+>
+
+      <label>
+        Bild
+      </label>
+
+	  <input
+  id="imageFile"
+  type="file"
+  accept="image/*"
+  onchange="
+    saveQuestion(
+      ${songIndex},
+      ${questionIndex}
+    )
+  "
+>
+
+      <div id="preview">
+
+        ${
+          q.image
+            ? `
+            <img
+              src="${q.image}"
+              style="
+                width:200px;
+                margin-top:15px;
+                border-radius:12px;
+              "
+            >
+            `
+            : ""
+        }
+
+      </div>
+
+	  <label
+  style="
+    font-size:18px;
+    font-weight:bold;
+  "
+>
+  ⏱️ Strafftid vid felsvar
+</label>
+
+<div
+  style="
+    display:flex;
+    gap:8px;
+    justify-content:flex-start;
+    align-items:center;
+    margin-bottom:8px;
+  "
+>
+
+<button
+  type="button"
+  class="smallButton"
+  onclick="changePenalty(-5)"
+>
+  −
+</button>
+
+		<span
+  id="penaltyValue"
+  style="
+    font-size:20px;
+    min-width:65px;
+    text-align:center;
+    font-weight:bold;
+  "
+>
+  ${q.penalty || 10} sek
+</span>
+
+<button
+  type="button"
+  class="smallButton"
+  onclick="changePenalty(5)"
+>
+  +
+</button>
+
+      </div>
+
+
+	  <button
+  class="danger deleteButton"
+  style="
+    font-size:13px;
+    padding:6px 12px;
+    margin-top:10px;
+  "
+  onclick="
+    deleteQuestion(
+      ${songIndex},
+      ${questionIndex}
+    )
+  "
+>
+  🗑️ Ta bort fråga
+</button>
+
+	  
+
+  `;
+
+}
+function renderFinalTaskEditor(
+  song,
+  songIndex
+){
+
+  return `
+
+    <div
+      style="
+        background:#fff8dc;
+        border-left:8px solid #f0c040;
+        border-radius:10px;
+        padding:20px;
+        margin:20px 0;
+      "
+    >
+
+      <h3>
+        🏁 Redigerar slutuppdrag
+      </h3>
+
+      <label>
+        Slutuppdrag
+      </label>
+
+	  <textarea
+  id="finalTaskText"
+  rows="6"
+  oninput="
+    songs[${songIndex}].finalTask =
+      this.value;
+    saveData();
+  "
+>${song.finalTask || ""}</textarea>
+	  
+	  <label>
+  Bild
+</label>
+
+<input
+  id="finalTaskImageFile"
+  type="file"
+  accept="image/*"
+>
+
+<div id="finalTaskPreview">
+
+  ${
+    song.finalTaskImage
+      ? `
+        <img
+          src="${song.finalTaskImage}"
+          style="
+            width:200px;
+            margin-top:15px;
+            border-radius:12px;
+          "
+        >
+      `
+      : ""
+  }
+
+</div>
+${
+  song.finalTaskImage
+    ? `
+      <button
+        class="danger"
+        onclick="
+          removeFinalTaskImage(
+            ${songIndex}
+          )
+        "
+      >
+        🗑️ Ta bort bild
+      </button>
+    `
+    : ""
+}
+	  
+
+    </div>
+
+  `;
+
+}
+
+function removeFinalTaskImage(
+  songIndex
+){
+
+  songs[
+    songIndex
+  ].finalTaskImage = "";
+
+  saveData();
+
+  openFinalTask2(
+    songIndex
+  );
+
+}
+function renderQuestionList(
+  song,
+  songIndex,
+  questionIndex
+){
+
+  let html = "";
+
+  song.questions.forEach((question, i)=>{
+
+	  if(i === questionIndex){
+
+      html += `
+
+        <div
+          style="
+		  background:#fff8dc;
+border-left:8px solid #f0c040;
+border-radius:10px;
+padding:20px;
+margin:20px 0;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+          "
+        >
+
+          <h3>
+            ✏️ Redigerar fråga ${i + 1}
+          </h3>
+
+          ${renderQuestionEditor(
+            song,
+            question,
+            songIndex,
+            i
+          )}
+
+        </div>
+
+      `;
+
+    }
+    else{
+
+      html += renderQuestionCard(
+        songIndex,
+        question,
+        i
+      );
+
+    }
+
+  });
+  
+html += `
+  <button
+    onclick="
+      addQuestion(
+        ${songIndex}
+      )
+    "
+  >
+    ➕ Lägg till fråga
+  </button>
+`;
+  
+  if (questionIndex !== -1) {
+
+  html += renderFinalTaskCard(
+    songIndex,
+    song
+  );
+
+}
+
+  return html;
+
+}
+
+function previewSong(
+  songIndex
+){
+
+  alert(
+    "Förhandsgranskning kommer snart!"
+  );
+
+}
+
+function songMenu(
+  songIndex
+){
+
+  const song =
+    songs[songIndex];
+
+  let html = `
+
+    <div class="card">
+
+      <h2>
+        🎵 ${song.title}
+      </h2>
+
+	  <button
+  onclick="
+    joinGame(
+      ${songIndex}
+    )
+  "
+>
+  ▶️ Starta låt
+</button>
+
+<button
+  class="secondary"
+  onclick="
+    previewFinalTask(
+      ${songIndex}
+    )
+  "
+>
+  🏁 Slutuppdrag
+</button>
+
+      <button
+        class="secondary"
+        onclick="
+          openLibrary()
+        "
+      >
+        ⬅️ Låtbibliotek
+      </button>
+
+      <button
+        class="secondary"
+        onclick="
+          editSong(
+            ${songIndex}
+          )
+        "
+      >
+        ✏️ Redigera
+      </button>
+      <button
+        class="danger"
+        onclick="
+          deleteSong(
+            ${songIndex}
+          )
+        "
+      >
+        🗑️ Ta bort låt
+      </button>
+
+    </div>
+
+  `;
+
+  screen.innerHTML =
+    html;
+
+}
+
+function startSong(
+  songIndex
+){
+
+  const song =
+    songs[songIndex];
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        🎵 ${song.title}
+      </h2>
+
+	  <h3>
+  Anslut deltagare
+</h3>
+
+	  <p
+  style="
+    text-align:center;
+    font-size:18px;
+    margin:20px 0;
+  "
+>
+  Låt deltagarna skanna QR-koden
+  för att ansluta.
+</p>
+
+<div
+  style="
+    width:220px;
+    height:220px;
+    margin:30px auto;
+    border:3px dashed #999;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    color:#666;
+  "
+>
+  QR-kod
+</div>
+<p
+  style="
+    text-align:center;
+    font-size:18px;
+    margin-top:20px;
+    color:#666;
+  "
+>
+  0 deltagare anslutna
+</p>
+
+<button
+  onclick="
+    beginGame(
+      ${songIndex}
+    )
+  "
+>
+  ▶️ Börja
+</button>
+
+<button
+  class="secondary"
+  onclick="
+    songMenu(
+      ${songIndex}
+    )
+  "
+>
+  ❌ Avbryt
+</button>
+
+    </div>
+
+  `;
+
+}
+
+function showFinalTask(
+  songIndex
+){
+
+  const song =
+    songs[songIndex];
+
+  let html = `
+
+    <div class="card">
+
+	
+
+<div
+  style="
+    text-align:center;
+    margin-top:20px;
+  "
+>
+
+  <div
+    style="
+      font-size:60px;
+    "
+  >
+    🏁
+  </div>
+
+<h2
+  style="
+    font-size:38px;
+    margin:10px 0 8px 0;
+  "
+>
+  Slutuppdrag
+</h2>
+
+<div
+  style="
+    font-size:24px;
+    font-style:italic;
+    color:#666;
+    margin-bottom:30px;
+  "
+>
+  För att vinna matchen...
+</div>
+
+
+
+      <div
+        style="
+         background:#fff9e8;
+          padding:20px;
+          border-radius:12px;
+          font-size:22px;
+          text-align:center;
+        "
+      >
+        ${song.finalTask || "Inget slutuppdrag finns."}
+      </div>
+	  
+	  ${
+  song.finalTaskImage
+    ? `
+      <img
+        src="${song.finalTaskImage}"
+        style="
+          width:100%;
+          max-width:400px;
+          margin-top:20px;
+          border-radius:12px;
+        "
+      >
+    `
+    : ""
+}
+
+
+
+    </div>
+
+  `;
+
+  screen.innerHTML =
+    html;
+
+}
+
+function previewFinalTask(
+  songIndex
+){
+
+  showFinalTask(
+    songIndex
+  );
+
+  document
+    .querySelector(".card")
+    .innerHTML += `
+      <button
+        class="secondary"
+        onclick="
+          songMenu(${songIndex})
+        "
+        style="
+          margin-top:20px;
+        "
+      >
+        ⬅ Tillbaka
+      </button>
+    `;
+
+}
+
+function beginGame(
+  songIndex
+){
+
+  const song =
+    songs[songIndex];
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        Fråga 1
+      </h2>
+
+      <p
+        style="
+          font-size:24px;
+          text-align:center;
+          margin:40px 0;
+        "
+      >
+        ${song.questions[0].question}
+      </p>
+
+      <button
+        class="secondary"
+        onclick="
+          startSong(
+            ${songIndex}
+          )
+        "
+      >
+        ⬅️ Tillbaka
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+function joinGame(
+  songIndex
+){
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        ✅ Du är ansluten
+      </h2>
+
+      <p
+        style="
+          text-align:center;
+          font-size:18px;
+          margin:25px 0;
+        "
+      >
+        Är ni flera i laget?
+      </p>
+
+      <p
+        style="
+          text-align:center;
+          color:#666;
+        "
+      >
+        Låt en lagkamrat skanna
+        QR-koden nedan så kan ni
+        spela tillsammans.
+      </p>
+
+      <div
+        style="
+          width:220px;
+          height:220px;
+          margin:30px auto;
+          border:3px dashed #999;
+          border-radius:12px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        "
+      >
+        QR-kod
+      </div>
+
+	  <button
+  onclick="
+    showQuestion(
+      ${songIndex},
+      0
+    )
+  "
+>
+  🎵 Börja spela
+</button>
+    </div>
+
+  `;
+
+}
+
+function showQuestion(
+  songIndex,
+  questionIndex
+){
+
+  const question =
+    songs[songIndex]
+      .questions[questionIndex];
+
+  screen.innerHTML = `
+
+<div
+  class="card"
+  id="questionCard"
+>
+<div id="questionContent">
+
+      <p
+        style="
+          font-size:30px;
+          text-align:center;
+          margin:40px 0;
+          font-weight:bold;
+        "
+      >
+        ${question.question}
+      </p>
+	  ${question.image ? `
+  <div
+    style="
+      text-align:center;
+      margin:25px 0;
+    "
+  >
+    <img
+      src="${question.image}"
+      style="
+        max-width:100%;
+        max-height:220px;
+        border-radius:12px;
+      "
+    >
+  </div>
+` : ""}
+	  <input
+  id="answer"
+  type="text"
+  placeholder="Skriv ditt svar..."
+  onkeydown="
+  if(event.key==='Enter'){
+    checkAnswer(
+      ${songIndex},
+      ${questionIndex}
+    );
+  }
+"
+  style="
+    width:100%;
+    padding:14px;
+    font-size:20px;
+    margin-top:20px;
+    box-sizing:border-box;
+  "
+>
+<div
+  id="message"
+  style="
+    text-align:center;
+    color:#c00;
+    font-weight:bold;
+    min-height:30px;
+    margin-top:15px;
+  "
+></div>
+
+<button
+id="answerButton"
+  style="
+    margin-top:20px;
+  "
+  onclick="
+    checkAnswer(
+      ${songIndex},
+      ${questionIndex}
+    )
+  "
+>
+  Svara
+</button>
+
+
+    </div>
+	<div
+  id="penaltyScreen"
+  style="
+    display:none;
+    height:320px;
+  "
+></div>
+<div
+  id="successScreen"
+  style="
+    display:none;
+    height:320px;
+  "
+></div>
+	</div>
+
+  `;
+  document
+  .getElementById(
+    "answer"
+  )
+  .focus();
+
+}
+
+function checkAnswer(
+  songIndex,
+  questionIndex
+){
+
+  const answer =
+    document
+      .getElementById("answer")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const correctAnswer =
+    songs[songIndex]
+      .questions[questionIndex]
+      .answer
+      .trim()
+      .toLowerCase();
+
+if(
+  answer ==
+  correctAnswer
+){
+
+  document
+    .getElementById(
+      "questionContent"
+    )
+    .style.display =
+    "none";
+
+  document
+    .getElementById(
+      "successScreen"
+    )
+    .style.display =
+    "block";
+
+  document
+    .getElementById(
+      "questionCard"
+    )
+    .style.background =
+    "#dff7df";
+
+  document
+    .getElementById(
+      "successScreen"
+    )
+    .innerHTML =
+`
+<div
+  style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:320px;
+  "
+>
+  <svg
+    width="180"
+    height="180"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#28a745"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M20 6L9 17l-5-5"/>
+  </svg>
+</div>
+`;
+
+  if(
+    navigator.vibrate
+  ){
+    navigator.vibrate(80);
+  }
+
+  setTimeout(
+    function(){
+
+      if(
+        questionIndex <
+        songs[songIndex].questions.length - 1
+      ){
+
+        showQuestion(
+          songIndex,
+          questionIndex + 1
+        );
+
+      }
+      else{
+
+        showFinalTask(
+          songIndex
+        );
+
+      }
+
+    },
+    2000
+  );
+
+}
+else{
+
+  flashRed();
+
+  document
+    .getElementById(
+      "questionContent"
+    )
+    .style.display =
+    "none";
+
+let seconds =
+  songs[songIndex]
+    .questions[questionIndex]
+    .penalty || 10;
+  
+  const countdown =
+  setInterval(
+    function(){seconds--;
+		if(
+  seconds < 0
+){
+
+  clearInterval(
+    countdown
+  );
+document
+  .getElementById(
+    "penaltyScreen"
+  )
+  .style.display =
+  "none";
+  
+  document
+  .getElementById(
+    "questionCard"
+  )
+  .style.background =
+  "";
+
+document
+  .getElementById(
+    "questionContent"
+  )
+  .style.display =
+  "block";
+  
+  document
+  .getElementById(
+    "answer"
+  )
+  .value = "";
+  document
+  .getElementById(
+    "answer"
+  )
+  .disabled = false;
+setTimeout(
+  function(){
+
+    document
+      .getElementById(
+        "answer"
+      )
+      .focus();
+
+  },
+  50
+);
+  
+  document
+  .getElementById(
+    "answerButton"
+  )
+  .style.opacity =
+  "1";
+  return;
+
+}
+		document
+  .getElementById(
+    "countdown"
+  )
+  .textContent =
+  seconds;
+
+    },
+    1000
+  );
+
+  document
+    .getElementById(
+      "penaltyScreen"
+    )
+    .style.display =
+    "block";
+
+  document
+    .getElementById(
+      "penaltyScreen"
+    )
+    .innerHTML =
+    `
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          justify-content:center;
+          align-items:center;
+          height:320px;
+        "
+      >
+
+        <div
+          style="
+            font-size:24px;
+            margin-bottom:20px;
+          "
+        >
+          Nytt försök om...
+        </div>
+
+        <div style="font-size:60px;">
+          ⏳
+        </div>
+
+        <div
+          id="countdown"
+          style="
+            font-size:110px;
+            font-weight:bold;
+          "
+        >
+          ${seconds}
+        </div>
+
+      </div>
+    `;
+
+  document
+    .getElementById(
+      "answerButton"
+    )
+    .style.opacity = "0.4";
+
+  document
+    .getElementById(
+      "answer"
+    )
+    .disabled = true;
+
+}
+
+}
+
+function flashGreen(){
+
+	document
+  .getElementById(
+    "questionCard"
+  )
+  .style.background =
+  "#dff7df";
+  
+  document
+  .getElementById(
+    "questionCard"
+  )
+  .style.transform =
+  "translateY(-20px)";
+
+  setTimeout(
+    function(){
+
+		document
+  .getElementById(
+    "questionCard"
+  )
+  .style.background =
+  "";
+
+    },
+    2000
+  );
+
+}
+
+function flashRed(){
+
+  document
+    .getElementById(
+      "questionCard"
+    )
+    .style.background =
+    "#ffe3e3";
+
+	
+
+}
